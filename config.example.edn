@@ -2,4 +2,8 @@
  :token "YOUR-BOT-TOKEN"
  ;; long-polling interval (ms)
  :interval 500
+ ;; if message is more than threshold, this bot will send sticker to channel
+ :threshold 140
+ ;; sticker max mulue (0 ~ 5)
+ :sticker-range 5
  }

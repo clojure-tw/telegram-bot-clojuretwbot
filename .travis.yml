@@ -1,0 +1,17 @@
+language: clojure
+sudo: false
+env:
+  global:
+  - GH_REF: github.com/clojure-tw/what-you-say-is-too-long.git
+  - secure: j39/5SObYOWHEYHQLIsUXGQfMG9kDS857Gu5yYWjYLVlGOHBmO1hfyqtpWtNU/P0l5pezeSRlelO6AWwjhnk0eOEuIW6csRq6fkYRnUtV0VLSK0MbAh8g/0S7c6wtUfCWBMWUn1HX3GhpxaIntQXIK04AzZRsbQNLttWDLy3Dt/ark11glrsWZHB6hYe1g8C70VslEfae0dnTefnjbU3n16qDvgXfXMR6AbyfcO2VS69qcj6iA7UA5+xcbX/aYZd0MsbkmTCRRyEDcp6iFPAdH0Q4n8x8RqnPF36BroKAbp2m8WXEb/ddrJOUQLqZp4HhlOw3RYFShLVwO9N9epocI69802u3HO9pBtvqovw43A7s8Ftzr+3uyGXd9iYMJT3vjr+crKWhmvZNsjzBcBakBaP07RKFG+gwPWLiK1EIhSe2D6Ohr1cfvakRapprn6krtfFiejzbmUcKUEnMJdevSlARKI6LXvDk5/hn2LkT/HlIseqv//c+6BQZLyIC0aKyEw/0B4p/10K9HS5k/6b4tyFoISRpUQUpxFLdeuGaJvnavspaD9Rf9NMOcHl9Ncq+3R45xFTPgmXQ7UwY5GOhOa6fUBy5cNZy9fgqLwEnRdNouwfJ91qNwQQe7v41N7kOKgXMTWxT70Xa4/uWNsIL6KJnhwGBk5C/DioiVi3V3g=
+jdk:
+  - oraclejdk8
+  - oraclejdk7
+before_install:
+  - mkdir ~/bin
+  - wget https://raw.github.com/technomancy/leiningen/stable/bin/lein -P ~/bin/
+  - chmod a+x ~/bin/lein
+lein: ~/bin/lein
+script:
+  - lein marg
+  - ./deploy.sh
