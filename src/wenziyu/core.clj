@@ -1,6 +1,92 @@
-(ns wenziyu.core)
+(ns wenziyu.core
+  (:require [clj-http.client :as http]
+            [clojure.data.json :as json]
+            [clojure.edn :as edn]
+            [clojure.core.async :refer [chan go-loop >! <! put!] :as async]))
 
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
+
+(def state (atom nil))
+
+(def channel (chan))
+
+(defn parse-config [url]
+  (edn/read-string (slurp url)))
+
+(defn send-sticker! [chat-id]
+  (let [img (str "wtf" (rand-int 2) ".jpg")
+        token (-> @state :token)]
+    (http/post (str "https://api.telegram.org/bot" token "/sendSticker")
+               {:multipart [{:name "chat_id" :content (str chat-id)}
+                            {:name "sticker" :content (clojure.java.io/file (clojure.java.io/resource img))}]}
+               )))
+
+(comment
+  (count
+   "今天早上被人嚇到，決定寫這個bot來壓壓驚，我們都知道寫文章一定要分段落，講話也是，全部擠在一起實在讓人看不太懂。為了解決這個問題，我開發一個telegram bot會去監控是不是有人講話講的太誇張，太誇張的話就會讓這隻bot顯示WTF 系列圖片。所以大家看到這樣的圖片就會知道自己實在太誇張了，不過這不是為了避免文字獄，我正在努力亂掰一些訊息，反正就是只要你的訊息超過了256，這隻 bot就會開始運作，貼上新的圖片給你看。我的天啊 256字有夠他媽的難掰，我繼續掰掰掰掰，這隻bot晚點整理好後會放到clojure-tw repo ，總之就是好玩就好，現在到底己行文字了啊啊啊啊啊啊。
+"
+   ))
+
+(defn a [& args]
+  (reduce '+ args))
+
+(a 1 2 3)
+(defn receive-message
+  [offset]
+  (let [token    (-> @state :token)
+        interval (-> @state :interval)
+        req (-> (http/get (str "https://api.telegram.org/bot" token "/getUpdates")
+                          {:query-params {:offset offset}})
+                :body
+                (json/read-str :key-fn keyword))
+        result (-> req :result)]
+
+    (println (str ">>> " req))
+
+    ;; when event come, send it to channel
+    (when-not (and (nil? result) (zero? offset))
+      (put! channel result))
+
+    ;; sleep for prevent busy polling
+    (Thread/sleep interval)
+
+    ;; return update_id
+    ;; An update is considered confirmed as soon as getUpdates is called with an
+    ;; offset higher than its update_id.
+    (if-let [ofs (-> result last :update_id)]
+      (inc ofs) 0)))
+
+;; As busy loop to listen and dispatch telegram events
+(defn- listen-telegram-events []
+  (println "listen bot ")
+  (loop [offset 0]
+    (recur (receive-message offset))))
+
+;;
+(defn event-loop []
+  (go-loop []
+    (doseq [c (<! channel)]
+      (let [message (-> c :message)
+            text    (-> message :text)
+            chat-id (-> message :chat :id)]
+
+        (when-not (nil? text)
+          ;; if user say more than 300 word, send a wtf sticker to group
+          (when (< 256 (count text))
+            (send-sticker! chat-id))
+          )))
+    (recur)))
+
+(defn start-bot [config]
+  ;; we only modify state once
+  (reset! state config)
+  ;; listen events
+  (event-loop)
+  ;; listen telegram event
+  (listen-telegram-events))
+
+(defn -main [& args]
+  ;; check token not nil
+  (let [arg1 (nth args 0)]
+    (if arg1
+      (-> (parse-config arg1) (start-bot))
+      (println "ERROR: Please specify config file."))))

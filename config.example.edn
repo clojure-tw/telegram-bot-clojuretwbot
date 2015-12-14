@@ -1,0 +1,5 @@
+{;; token get from bot father
+ :token "YOUR-BOT-TOKEN"
+ ;; long-polling interval (ms)
+ :interval 500
+ }
