@@ -2,7 +2,9 @@
   (:require [clj-http.client :as http]
             [clojure.data.json :as json]
             [clojure.edn :as edn]
-            [clojure.core.async :refer [chan go-loop >! <! put!] :as async]))
+            [clojure.core.async :refer [chan go-loop >! <! put!] :as async]
+            [feedparser-clj.core :as feed]
+            [clojure.data :as data]))
 
 ;; Simple example for testing
 (comment
@@ -108,3 +110,13 @@
     (if arg1
       (-> (parse-config arg1) (start-app))
       (println "ERROR: Please specify config file."))))
+
+;; Feed parser
+(defn get-feed-url
+  [feed-uri feed-archive]
+  (let [atom-feed (feed/parse-feed feed-uri)
+        archive (edn/read-string (slurp feed-archive))
+        new-item (first (data/diff (map :uri (:entries atom-feed)) archive))]
+    (spit feed-archive
+          (with-out-str (pr (distinct (concat new-item archive)))))
+    new-item))

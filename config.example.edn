@@ -6,4 +6,10 @@
  :threshold 140
  ;; sticker max mulue (0 ~ 5)
  :sticker-range 5
+
+ ;; feed option for feed-parser
+ ;; feed-uri, support atom/rss
+ :feed-uri "http://planet.clojure.in/atom.xml"
+ ;; file to save
+ :feed-archive "resources/archive.edn"
  }
