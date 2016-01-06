@@ -11,7 +11,7 @@
                  [org.clojure/data.json "0.2.6"]
                  [im.chit/cronj "1.4.3"]
                  [com.cemerick/url "0.1.1"]
-                 [com.taoensso/timbre "4.1.4"]]
+                 [com.taoensso/timbre "4.2.0"]]
 
   :plugins [[michaelblume/lein-marginalia "0.9.0"]]
   :main ^:skip-aot clojuretwbot.core)

@@ -33,7 +33,7 @@
               {:content-type :json
                :form-params {:chat_id chat-id
                              :text message}})
-   (timbre/log (str "send-message! with :chat-id " chat-id " :message " message))))
+   (timbre/info (str "send-message! with :token " token " :chat-id " chat-id " :message " message))))
 
 ;; Feed parser
 (defn get-feed-url
@@ -50,11 +50,11 @@
   "Check if new feed exist, send url to telegram if yes."
   ([] (tweet-to-telegram nil nil))
   ([_ _]
+   (timbre/info "tweet to telegram trigger!!")
    (let [feed (reverse (get-feed-url))]
      (doseq [f feed]
        (if (valid-url? f)
-         (send-message! (str f)))))
-   (timbre/log "tweet to telegram trigger!!")))
+         (send-message! (str f)))))))
 
 (def scheduler
   (cronj :entries
