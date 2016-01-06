@@ -13,6 +13,7 @@ Copy the `config.example.edn` to `config.edn` and modify the bot token then run
 ## License
 
 Copyright © 2016 Yu-Fu, Wu <<wennynnewenny@gmail.com>>
+
 Copyright © 2016 Yen-Chin, Lee <<coldnew.tw@gmail.com>>
 
 Distributed under the GPLv3 or any later version.
