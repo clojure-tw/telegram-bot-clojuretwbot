@@ -3,7 +3,8 @@
             [clojure.data.json :as json]
             [clojure.edn :as edn]
             [clojure.core.async :refer [chan go-loop >! <! put!] :as async]
-            [feedparser-clj.core :as feed]))
+            [feedparser-clj.core :as feed]
+            [clojure.data :as data]))
 
 ;; Simple example for testing
 (comment
@@ -111,4 +112,10 @@
       (println "ERROR: Please specify config file."))))
 
 ;; Feed parser
-(def atom-feed (feed/parse-feed "http://planet.clojure.in/atom.xml"))
+(defn get-feed-url
+  [feed-uri feed-archive]
+  (let [atom-feed (feed/parse-feed feed-uri)
+        archive (slurp feed-archive)]
+    (map :uri (:entries atom-feed))))
+
+(spit feed-archive (with-out-str (pr archive)))
