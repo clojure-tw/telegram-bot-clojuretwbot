@@ -7,6 +7,7 @@
                  [org.clojure/core.async "0.2.374"]
                  [clj-http "2.0.0"]
                  [cheshire "5.5.0"]
+                 [org.clojars.scsibug/feedparser-clj "0.4.0"]
                  [org.clojure/data.json "0.2.6"]]
 
   :plugins [[michaelblume/lein-marginalia "0.9.0"]]
