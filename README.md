@@ -1,10 +1,8 @@
-# What you say is too long - A telegram bot to indicate long sentence
-[![Build Status](https://travis-ci.org/clojure-tw/what-you-say-is-too-long.svg?branch=master)](https://travis-ci.org/clojure-tw/what-you-say-is-too-long)
-[![License](http://img.shields.io/badge/license-Eclipse-blue.svg?style=flat)](https://www.eclipse.org/legal/epl-v10.html)
+# clojuretwbot - A telegram bot for clojure.tw channel
+[![Build Status](https://travis-ci.org/clojure-tw/telegram-bot-clojuretwbot.svg?branch=master)](https://travis-ci.org/clojure-tw/telegram-bot-clojuretwbot)
+[![License](http://img.shields.io/badge/license-GPL-blue.svg?style=flat)](http://www.opensource.org/licenses/gpl-license.html)
 
-A simple telegram bot to indicate if someone send long sentence in telegram
-group.
-
+This is a simple telegram bot designed for clojure.tw community.
 
 ## Usage
 
@@ -14,6 +12,7 @@ Copy the `config.example.edn` to `config.edn` and modify the bot token then run
 
 ## License
 
-Copyright © 2015 Yen-Chin, Lee <<coldnew.tw@gmail.com>>
+Copyright © 2016 Yu-Fu, Wu <<wennynnewenny@gmail.com>>
+Copyright © 2016 Yen-Chin, Lee <<coldnew.tw@gmail.com>>
 
-Distributed under the Eclipse Public License either version 1.0 or any later version.
+Distributed under the GPLv3 or any later version.
