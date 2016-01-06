@@ -28,10 +28,10 @@
 (defn send-message!
   ([message] (send-message! @state message))
   ([{:keys [chat-id token]} message]
-   (client/post (str "https://api.telegram.org/bot" token "/sendMessage")
-                {:content-type :json
-                 :form-params {:chat_id chat-id
-                               :text message}})))
+   (http/post (str "https://api.telegram.org/bot" token "/sendMessage")
+              {:content-type :json
+               :form-params {:chat_id chat-id
+                             :text message}})))
 
 ;; Feed parser
 (defn get-feed-url
