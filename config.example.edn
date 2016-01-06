@@ -1,6 +1,9 @@
 {;; token get from bot father
  :token "YOUR-BOT-TOKEN"
 
+ ;; This bot only support one channel
+ :chat-id "YOUR-CHANNEL-CHAT-ID"
+
  ;; long-polling interval (ms)
  :interval 500
 
