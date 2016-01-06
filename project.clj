@@ -8,7 +8,9 @@
                  [clj-http "2.0.0"]
                  [cheshire "5.5.0"]
                  [org.clojars.scsibug/feedparser-clj "0.4.0"]
-                 [org.clojure/data.json "0.2.6"]]
+                 [org.clojure/data.json "0.2.6"]
+                 [im.chit/cronj "1.4.3"]
+                 [com.cemerick/url "0.1.1"]]
 
   :plugins [[michaelblume/lein-marginalia "0.9.0"]]
   :main ^:skip-aot clojuretwbot.core)
