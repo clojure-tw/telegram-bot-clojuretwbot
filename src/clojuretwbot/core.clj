@@ -6,7 +6,8 @@
             [feedparser-clj.core :as feed]
             [clojure.data :as data]
             [cronj.core :as cronj :refer [cronj]]
-            [cemerick.url :refer [url]]))
+            [cemerick.url :refer [url]]
+            [taoensso.timbre :as timbre :refer [debug info warn error fatal]]))
 
 ;; save config here in edn format
 (def state (atom nil))
@@ -31,7 +32,8 @@
    (http/post (str "https://api.telegram.org/bot" token "/sendMessage")
               {:content-type :json
                :form-params {:chat_id chat-id
-                             :text message}})))
+                             :text message}})
+   (timbre/log (str "send-message! with :chat-id " chat-id " :message " message))))
 
 ;; Feed parser
 (defn get-feed-url
@@ -46,24 +48,29 @@
 
 (defn tweet-to-telegram
   "Check if new feed exist, send url to telegram if yes."
-  [_ _]
-  (let [feed (reverse (get-feed-url))]
-    (doseq [f feed]
-      (if (valid-url? f)
-        (send-message! (str f))))))
+  ([] (tweet-to-telegram nil nil))
+  ([_ _]
+   (let [feed (reverse (get-feed-url))]
+     (doseq [f feed]
+       (if (valid-url? f)
+         (send-message! (str f)))))
+   (timbre/log "tweet to telegram trigger!!")))
 
 (def scheduler
   (cronj :entries
          [{:id "tweet-to-telegram"
            :handler tweet-to-telegram
-           :schedule "0 0 /1 * * * *"   ; every 1hr
-           ;; :schedule "/2 * * * * * *"   ; every 2s
+           :schedule "0 /30 * * * * *"   ; every 30minute
+           ;;:schedule "/2 * * * * * *"   ; every 2s
            }]))
 
 ;; real entry point
 (defn start-app [config]
   ;; we only modify state once
   (reset! state config)
+  ;; before run scheduler, we run it first time to update db
+  (tweet-to-telegram)
+  ;; start the scheduler
   (cronj/start! scheduler)
   (println "start scheduler for checking planet.clojure"))
 
