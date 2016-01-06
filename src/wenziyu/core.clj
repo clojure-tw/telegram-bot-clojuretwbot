@@ -2,7 +2,8 @@
   (:require [clj-http.client :as http]
             [clojure.data.json :as json]
             [clojure.edn :as edn]
-            [clojure.core.async :refer [chan go-loop >! <! put!] :as async]))
+            [clojure.core.async :refer [chan go-loop >! <! put!] :as async]
+            [feedparser-clj.core :as feed]))
 
 ;; Simple example for testing
 (comment
@@ -108,3 +109,6 @@
     (if arg1
       (-> (parse-config arg1) (start-app))
       (println "ERROR: Please specify config file."))))
+
+;; Feed parser
+(def atom-feed (feed/parse-feed "http://planet.clojure.in/atom.xml"))
