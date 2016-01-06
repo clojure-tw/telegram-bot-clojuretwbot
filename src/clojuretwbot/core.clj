@@ -1,4 +1,4 @@
-(ns wenziyu.core
+(ns clojuretwbot.core
   (:require [clj-http.client :as http]
             [clojure.data.json :as json]
             [clojure.edn :as edn]
