@@ -115,7 +115,8 @@
 (defn get-feed-url
   [feed-uri feed-archive]
   (let [atom-feed (feed/parse-feed feed-uri)
-        archive (slurp feed-archive)]
-    (map :uri (:entries atom-feed))))
-
-(spit feed-archive (with-out-str (pr archive)))
+        archive (edn/read-string (slurp feed-archive))
+        new-item (first (data/diff (map :uri (:entries atom-feed)) archive))]
+    (spit feed-archive
+          (with-out-str (pr (distinct (concat new-item archive)))))
+    new-item))
