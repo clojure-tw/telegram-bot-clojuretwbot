@@ -41,9 +41,11 @@
   ([feed-uri feed-archive]
    (let [atom-feed (feed/parse-feed feed-uri)
          archive (edn/read-string (slurp feed-archive))
-         new-item (first (data/diff (map :uri (:entries atom-feed)) archive))]
+         ;; new-item (first (data/diff (map :uri (:entries atom-feed)) archive))
+         new-item (into #{} (map (fn [x] (if (contains? archive x) x nil)) atom-feed))
+         ]
      (spit feed-archive
-           (with-out-str (pr (distinct (concat new-item archive)))))
+           (with-out-str (pr (distinct (into #{} (concat new-item archive))))))
      new-item)))
 
 (defn tweet-to-telegram
