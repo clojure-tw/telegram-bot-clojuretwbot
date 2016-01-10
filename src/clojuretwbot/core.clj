@@ -27,7 +27,7 @@
   (edn/read-string (slurp url)))
 
 (defn send-message!
-  ([message] (send-message! @state message))
+  ([message] (send-message! @state message nil))
   ([message params] (send-message! @state message params))
   ([{:keys [chat-id token]} message params]
    (http/post (str "https://api.telegram.org/bot" token "/sendMessage")
