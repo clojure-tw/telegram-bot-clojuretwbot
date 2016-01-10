@@ -7,10 +7,16 @@
             [clojure.data :as data]
             [cronj.core :as cronj :refer [cronj]]
             [cemerick.url :refer [url]]
-            [taoensso.timbre :as timbre :refer [debug info warn error fatal]]))
+            [taoensso.timbre :as timbre :refer [debug info warn error fatal]]
+            ;; backends
+            [clojuretwbot.db :as db]
+            [clojuretwbot.backend.google-groups :as google-groups]))
 
 ;; save config here in edn format
 (def state (atom nil))
+
+;; store init status
+(def status (atom {:init false}))
 
 (defn valid-url?
   "Test whether a URL is valid, returning a map of information about it if
@@ -63,15 +69,41 @@
          [{:id "tweet-to-telegram"
            :handler tweet-to-telegram
            :schedule "0 /30 * * * * *"   ; every 30minute
-           ;;:schedule "/2 * * * * * *"   ; every 2s
+           }
+          {:id "clojure-mailing-list"
+           :handler google-groups/find-ANN-in-clojure-list
+           :schedule "0 /30 * * * * *"  ; every 30minute
            }]))
+
+(defn mailing-list-dispatcher
+  []
+  (go-loop []
+    (let [{:keys [title link] :as ch} (<! google-groups/channel)]
+      ;; check if this link is already store in db, if not push to telegram
+      (when (and (not (db/contains-link? link)) (:init @status))
+        (send-message! (str title "\n" link) {:disable_web_page_preview true}))
+      ;; Add link to db
+      (db/add-link link))
+    (recur)))
+
+(defn init! []
+  (tweet-to-telegram)
+  (google-groups/find-ANN-in-clojure-list)
+  ;; We finish initialize
+  (Thread/sleep (* 10 1000))            ; FIXME: not a good method, we need to wait channel first init
+  (swap! status assoc :init true))
+
+(defn event-loop []
+  (mailing-list-dispatcher))
 
 ;; real entry point
 (defn start-app [config]
   ;; we only modify state once
   (reset! state config)
+  ;; start event loop for listen events
+  (event-loop)
   ;; before run scheduler, we run it first time to update db
-  (tweet-to-telegram)
+  (init!)
   ;; start the scheduler
   (cronj/start! scheduler)
   (println "start scheduler for checking planet.clojure"))
