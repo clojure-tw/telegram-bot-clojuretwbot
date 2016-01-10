@@ -45,7 +45,7 @@
          ;; new-item (first (data/diff (map :uri (:entries atom-feed)) archive))
          new-item (into #{} (map (fn [x] (if (contains? archive x) x nil)) atom-feed))]
      (spit feed-archive
-           (with-out-str (pr (distinct (into #{} (concat new-item archive))))))
+           (with-out-str (pr (into #{} (concat new-item archive)))))
      new-item)))
 
 (defn tweet-to-telegram
