@@ -40,7 +40,7 @@
 (defn get-feed-url
   ([] (get-feed-url (:feed-uri @state) (:feed-archive @state)))
   ([feed-uri feed-archive]
-   (let [atom-feed (feed/parse-feed feed-uri)
+   (let [atom-feed (map :link (:entries (feed/parse-feed feed-uri)))
          archive (edn/read-string (slurp feed-archive))
          ;; new-item (first (data/diff (map :uri (:entries atom-feed)) archive))
          new-item (into #{} (map (fn [x] (if (contains? archive x) x nil)) atom-feed))]
