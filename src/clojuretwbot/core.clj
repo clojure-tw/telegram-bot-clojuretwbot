@@ -28,11 +28,12 @@
 
 (defn send-message!
   ([message] (send-message! @state message))
-  ([{:keys [chat-id token]} message]
+  ([message params] (send-message! @state message params))
+  ([{:keys [chat-id token]} message params]
    (http/post (str "https://api.telegram.org/bot" token "/sendMessage")
               {:content-type :json
-               :form-params {:chat_id chat-id
-                             :text message}})
+               :form-params (merge {:chat_id chat-id
+                                    :text message} params)})
    (timbre/info (str "send-message! with :token " token " :chat-id " chat-id " :message " message))))
 
 ;; Feed parser
