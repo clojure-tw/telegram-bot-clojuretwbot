@@ -40,5 +40,5 @@
 (defn find-ANN-in-clojure-list
   "Find ANN contents in clojure mailing-list."
   ([_ _] (find-ANN-in-clojure-list))
-  ([] (println "adsad")
+  ([]
    (find-ANN "https://groups.google.com/forum/feed/clojure/msgs/rss_v2_0.xml")))
