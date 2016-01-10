@@ -28,8 +28,9 @@
       :results
       :item))
 
-(defn find-ANN [url]
+(defn find-ANN
   "Find ANN content."
+  [url]
   (doseq [k (filter #(or (re-matches #"\[ANN\].*" (:title %))
                          (re-matches #"ANN:.*" (:title %)))
                     (parse-rss url))]
