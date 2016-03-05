@@ -1,9 +1,7 @@
 language: clojure
 sudo: false
 env:
-  - DATABASE="resource/database.db"
-  - TOKEN=""
-  - CHAT_ID=""
+  - DATABASE="resources/database.db" TOKEN="" CHAT_ID=""
 jdk:
   - oraclejdk8
   - oraclejdk7
