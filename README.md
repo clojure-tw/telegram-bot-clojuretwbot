@@ -6,9 +6,19 @@ This is a simple telegram bot designed for clojure.tw community.
 
 ## Usage
 
-Copy the `config.example.edn` to `config.edn` and modify the bot token then run
+To use this bot, you need to setup following environment variables: *TOKEN*, *CHAT_ID*, *DATABASE*
 
-    lein run -- config.edn
+If you don't have any database, you need to run following command first
+
+```bash
+   TOKEN="telegram bot token" CHAT_ID="telegram room id" DATABASE="resources/database.db" lein run -- migrate
+```
+
+then start the bot
+
+```bash
+   TOKEN="telegram bot token" CHAT_ID="telegram room id" DATABASE="resources/database.db" lein run 
+```
 
 ## License
 
