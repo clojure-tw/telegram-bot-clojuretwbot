@@ -1,5 +1,6 @@
 # clojuretwbot - A telegram bot for clojure.tw channel
 [![Build Status](https://travis-ci.org/clojure-tw/telegram-bot-clojuretwbot.svg?branch=master)](https://travis-ci.org/clojure-tw/telegram-bot-clojuretwbot)
+[![Dependencies Status](https://jarkeeper.com/clojure-tw/telegram-bot-clojuretwbot/status.svg)](https://jarkeeper.com/clojure-tw/telegram-bot-clojuretwbot)
 [![License](http://img.shields.io/badge/license-GPL-blue.svg?style=flat)](http://www.opensource.org/licenses/gpl-license.html)
 
 This is a simple telegram bot designed for clojure.tw community.
