@@ -45,7 +45,7 @@
       (when (not (db/contains-link? link))
         (println (str "dispatch " link))
         (if (nil? description) ; some link can't be previewed by telegram
-          (send-message! (str "<pre>" title "</pre>\n" link) {:disable_web_page_preview true})
+          (send-message! (str "<b>" title "</b>\n" link) {:disable_web_page_preview true})
           (send-message! (str link)))
         ;; Add link to db
         (db/add-link link)))
