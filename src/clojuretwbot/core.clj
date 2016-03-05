@@ -33,7 +33,7 @@
          [;; every 30minute
           {:id "feed-fetcher"
            :handler (fn [_ _] (feed/fetch-all))
-           :schedule "0 /1 * * * * *"}]))
+           :schedule "0 /30 * * * * *"}]))
 
 (defn feeds-dispatcher []
   (go-loop []
