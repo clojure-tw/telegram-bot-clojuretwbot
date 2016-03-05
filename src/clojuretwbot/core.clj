@@ -1,30 +1,17 @@
 (ns clojuretwbot.core
-  (:require [clj-http.client :as http]
-            [clojure.data.json :as json]
-            [clojure.edn :as edn]
-            [clojure.core.async :refer [chan go-loop >! <! put!] :as async]
-            [feedparser-clj.core :as feed]
-            [clojure.data :as data]
-            [cronj.core :as cronj :refer [cronj]]
-            [cemerick.url :refer [url]]
-            [taoensso.timbre :as timbre :refer [debug info warn error fatal]]
+  (:require [clj-http.client    :as http]
+            [clojure.data.json  :as json]
+            [clojure.edn        :as edn]
+            [clojure.core.async :as async :refer [chan go-loop >! <! put!]]
+            [clojure.data       :as data]
+            [cronj.core         :as cronj :refer [cronj]]
+            [taoensso.timbre    :as timbre]
             ;; backends
-            [clojuretwbot.db :as db]
-            [clojuretwbot.backend.google-groups :as google-groups]))
+            [clojuretwbot.db   :as db]
+            [clojuretwbot.feed :as feed]))
 
 ;; save config here in edn format
 (def state (atom nil))
-
-;; store init status
-(def status (atom {}))
-
-(defn valid-url?
-  "Test whether a URL is valid, returning a map of information about it if
-  valid, nil otherwise."
-  [url-str]
-  (try
-    (url url-str)
-    (catch Exception _ nil)))
 
 ;; read the config file
 (defn parse-config
@@ -42,52 +29,30 @@
                                     :text message} params)})
    (timbre/info (str "send-message! with :token " token " :chat-id " chat-id " :message " message))))
 
-;; Feed parser
-(defn get-feed-url
-  ([] (get-feed-url (:feed-uri @state)))
-  ([feed-uri]
-   (let [atom-feed (map :link (:entries (feed/parse-feed feed-uri)))]
-     atom-feed)))
-
-(defn tweet-to-telegram
-  "Check if new feed exist, send url to telegram if yes."
-  ([] (tweet-to-telegram nil nil))
-  ([_ _]
-   (timbre/info "tweet to telegram trigger!!")
-   (let [feed (reverse (get-feed-url))]
-     (doseq [f feed]
-       (when (and (valid-url? f) (not (db/contains-link? f)))
-         (send-message! (str f))
-         (db/add-link f))))))
-
 (def scheduler
   (cronj :entries
-         [{:id "tweet-to-telegram"
-           :handler tweet-to-telegram
-           :schedule "0 /30 * * * * *"   ; every 30minute
-           }
-          {:id "clojure-mailing-list"
-           :handler google-groups/find-ANN-in-clojure-list
-           :schedule "0 /30 * * * * *"  ; every 30minute
-           }]))
+         [;; every 30minute
+          {:id "feed-fetcher"
+           :handler (fn [_ _] (feed/fetch-all))
+           :schedule "0 /1 * * * * *"}]))
 
-(defn mailing-list-dispatcher
-  []
+(defn feeds-dispatcher []
   (go-loop []
-    (let [{:keys [title link] :as ch} (<! google-groups/channel)]
+    (let [{:keys [title link description] :as ch} (<! feed/channel)]
       ;; check if this link is already store in db, if not push to telegram
+      (timbre/info "tweet to telegram trigger!!")
       (when (not (db/contains-link? link))
-        (send-message! (str title "\n" link) {:disable_web_page_preview true})
+        (println (str "dispatch " link))
+        (if (nil? description) ; some link can't be previewed by telegram
+          (send-message! (str title "\n" link) {:disable_web_page_preview true})
+          (send-message! (str link)))
         ;; Add link to db
         (db/add-link link)))
     (recur)))
 
-(defn init! []
-  (tweet-to-telegram)
-  (google-groups/find-ANN-in-clojure-list))
 
 (defn event-loop []
-  (mailing-list-dispatcher))
+  (feeds-dispatcher))
 
 ;; real entry point
 (defn start-app [config]
@@ -95,8 +60,6 @@
   (reset! state config)
   ;; start event loop for listen events
   (event-loop)
-  ;; before run scheduler, we run it first time to update db
-  (init!)
   ;; start the scheduler
   (cronj/start! scheduler)
   (println "start scheduler for checking planet.clojure"))

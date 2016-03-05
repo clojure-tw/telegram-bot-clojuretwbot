@@ -1,9 +1,6 @@
 (ns clojuretwbot.db.migrations
-  (:require
-   [migratus.core :as migratus]
-   [clojuretwbot.db.core :as core]
-   )
-  )
+  (:require [migratus.core :as migratus]
+            [clojuretwbot.db.core :as core]))
 
 (defn parse-ids [args]
   (map #(Long/parseLong %) (rest args)))

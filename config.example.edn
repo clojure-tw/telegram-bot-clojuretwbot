@@ -6,8 +6,4 @@
 
  ;; long-polling interval (ms)
  :interval 500
-
- ;; feed option for feed-parser
- ;; feed-uri, support atom/rss
- :feed-uri "http://planet.clojure.in/atom.xml"
  }
