@@ -7,12 +7,12 @@
   "Add link to db."
   [link]
   (timbre/info "add link: " link "to database")
-  (core/add-url! {:url link}))
+  (core/create-url! {:url link}))
 
 (defn contains-link?
   "Check if link is saved in db."
   [link]
-  (-> (core/find-url {:url link})
+  (-> (core/get-url {:url link})
       first
       boolean))
 

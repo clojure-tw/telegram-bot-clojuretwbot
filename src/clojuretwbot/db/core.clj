@@ -8,13 +8,3 @@
            :password    ""})
 
 (defqueries "sql/queries.sql" {:connection conn})
-
-;; (defn create!
-;;   "Create default database if not exist."
-;;   []
-;;   (try
-;;     (jdbc/db-do-commands db-spec
-;;                          (jdbc/create-table-ddl :tweets
-;;                                                 [:url :text]))
-
-;;     (catch Exception e (println e))))

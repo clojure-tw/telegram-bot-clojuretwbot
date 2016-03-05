@@ -1,8 +1,5 @@
 language: clojure
 sudo: false
-env:
-  global:
-  - GH_REF: github.com/clojure-tw/telegram-bot-clojuretwbot
 jdk:
   - oraclejdk8
   - oraclejdk7
@@ -12,4 +9,4 @@ before_install:
   - chmod a+x ~/bin/lein
 lein: ~/bin/lein
 script:
-  - lein marg
+  - lein test
