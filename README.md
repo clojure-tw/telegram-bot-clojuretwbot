@@ -9,6 +9,12 @@ This is a simple telegram bot designed for clojure.tw community.
 1. Fetch and send latest rss feed in: [Planet Clojure](http://planet.clojure.in/atom.xml) to telegram.
 2. Fetch and send any news in [Clojure Mailing-list](https://groups.google.com/forum/#!forum/clojure) which start with *[ANN]* to telegram.
 
+## Screenshots
+
+So you want to know what this bot do in real-life example, here's the screenshot:
+
+![Screenshot](https://raw.githubusercontent.com/clojure-tw/telegram-bot-clojuretwbot/master/screenshot/screenshot.png)
+
 ## Usage
 
 To use this bot, you need to setup following environment variables: *TOKEN*, *CHAT_ID*, *DATABASE*
