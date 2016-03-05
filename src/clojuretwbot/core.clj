@@ -64,11 +64,11 @@
   (cronj :entries
          [{:id "tweet-to-telegram"
            :handler tweet-to-telegram
-           :schedule "5 * * * * * *"   ; every 30minute
+           :schedule "0 /30 * * * * *"   ; every 30minute
            }
           {:id "clojure-mailing-list"
            :handler google-groups/find-ANN-in-clojure-list
-           :schedule "2 * * * * * *"  ; every 30minute
+           :schedule "0 /30 * * * * *"  ; every 30minute
            }]))
 
 (defn mailing-list-dispatcher
