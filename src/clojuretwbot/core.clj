@@ -67,15 +67,3 @@
         (do (db/migrate args) (System/exit 0))
         :else
         (start-app)))
-
-;; migration from old archive.edn
-(comment
-  (let [a (-> (slurp "archive.edn")
-              edn/read-string
-              vec)
-        l (count a)]
-    (loop [i 1]                           ; index 0 is nil
-      (when (< i l)
-        ;; (println (nth a i))
-        (db/add-link (nth a i))
-        (recur (inc i))))))
