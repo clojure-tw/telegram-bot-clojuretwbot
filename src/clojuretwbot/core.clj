@@ -26,6 +26,7 @@
    (http/post (str "https://api.telegram.org/bot" token "/sendMessage")
               {:content-type :json
                :form-params (merge {:chat_id chat-id
+                                    :parse_mode "HTML"
                                     :text message} params)})
    (timbre/info (str "send-message! with :token " token " :chat-id " chat-id " :message " message))))
 
@@ -44,7 +45,7 @@
       (when (not (db/contains-link? link))
         (println (str "dispatch " link))
         (if (nil? description) ; some link can't be previewed by telegram
-          (send-message! (str title "\n" link) {:disable_web_page_preview true})
+          (send-message! (str "<pre>" title "</pre>\n" link) {:disable_web_page_preview true})
           (send-message! (str link)))
         ;; Add link to db
         (db/add-link link)))
