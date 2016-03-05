@@ -11,3 +11,4 @@ pom.xml.asc
 .hg/
 .DS_Store
 config.edn
+/resources/database.db

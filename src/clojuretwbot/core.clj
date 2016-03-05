@@ -16,7 +16,7 @@
 (def state (atom nil))
 
 ;; store init status
-(def status (atom {:init false}))
+(def status (atom {}))
 
 (defn valid-url?
   "Test whether a URL is valid, returning a map of information about it if
@@ -44,15 +44,10 @@
 
 ;; Feed parser
 (defn get-feed-url
-  ([] (get-feed-url (:feed-uri @state) (:feed-archive @state)))
-  ([feed-uri feed-archive]
-   (let [atom-feed (map :link (:entries (feed/parse-feed feed-uri)))
-         archive (edn/read-string (slurp feed-archive))
-         ;; new-item (first (data/diff (map :uri (:entries atom-feed)) archive))
-         new-item (into #{} (map (fn [x] (if-not (contains? archive x) x nil)) atom-feed))]
-     (spit feed-archive
-           (with-out-str (pr (into #{} (concat new-item archive)))))
-     new-item)))
+  ([] (get-feed-url (:feed-uri @state)))
+  ([feed-uri]
+   (let [atom-feed (map :link (:entries (feed/parse-feed feed-uri)))]
+     atom-feed)))
 
 (defn tweet-to-telegram
   "Check if new feed exist, send url to telegram if yes."
@@ -61,18 +56,19 @@
    (timbre/info "tweet to telegram trigger!!")
    (let [feed (reverse (get-feed-url))]
      (doseq [f feed]
-       (if (valid-url? f)
-         (send-message! (str f)))))))
+       (when (and (valid-url? f) (not (db/contains-link? f)))
+         (send-message! (str f))
+         (db/add-link f))))))
 
 (def scheduler
   (cronj :entries
          [{:id "tweet-to-telegram"
            :handler tweet-to-telegram
-           :schedule "0 /30 * * * * *"   ; every 30minute
+           :schedule "5 * * * * * *"   ; every 30minute
            }
           {:id "clojure-mailing-list"
            :handler google-groups/find-ANN-in-clojure-list
-           :schedule "0 /30 * * * * *"  ; every 30minute
+           :schedule "2 * * * * * *"  ; every 30minute
            }]))
 
 (defn mailing-list-dispatcher
@@ -80,18 +76,15 @@
   (go-loop []
     (let [{:keys [title link] :as ch} (<! google-groups/channel)]
       ;; check if this link is already store in db, if not push to telegram
-      (when (and (not (db/contains-link? link)) (:init @status))
-        (send-message! (str title "\n" link) {:disable_web_page_preview true}))
-      ;; Add link to db
-      (db/add-link link))
+      (when (not (db/contains-link? link))
+        (send-message! (str title "\n" link) {:disable_web_page_preview true})
+        ;; Add link to db
+        (db/add-link link)))
     (recur)))
 
 (defn init! []
   (tweet-to-telegram)
-  (google-groups/find-ANN-in-clojure-list)
-  ;; We finish initialize
-  (Thread/sleep (* 10 1000))            ; FIXME: not a good method, we need to wait channel first init
-  (swap! status assoc :init true))
+  (google-groups/find-ANN-in-clojure-list))
 
 (defn event-loop []
   (mailing-list-dispatcher))
@@ -110,7 +103,22 @@
 
 ;; load config file and parse it
 (defn -main [& args]
-  (let [arg1 (nth args 0)]
-    (if arg1
-      (-> (parse-config arg1) (start-app))
-      (println "ERROR: Please specify config file."))))
+  (cond (some #{"migrate" "rollback"} args)
+        (do (db/migrate args) (System/exit 0))
+        :else
+        (let [arg1 (nth args 0)]
+          (if arg1
+            (-> (parse-config arg1) (start-app))
+            (println "ERROR: Please specify config file.")))))
+
+;; migration from old archive.edn
+(comment
+  (let [a (-> (slurp "archive.edn")
+              edn/read-string
+              vec)
+        l (count a)]
+    (loop [i 1]                           ; index 0 is nil
+      (when (< i l)
+        ;; (println (nth a i))
+        (db/add-link (nth a i))
+        (recur (inc i))))))

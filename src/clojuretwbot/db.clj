@@ -1,11 +1,20 @@
-(ns clojuretwbot.db)
+(ns clojuretwbot.db
+  (:require [clojuretwbot.db.core       :as core]
+            [clojuretwbot.db.migrations :as migrations]
+            [taoensso.timbre :as timbre :refer [debug info warn error fatal]]))
 
-(defonce database
-  (atom {:link #{}                      ; link we pused to telegram
-         }))
+(defn add-link
+  "Add link to db."
+  [link]
+  (timbre/info "add link: " link "to database")
+  (core/add-url! {:url link}))
 
-(defn add-link [link]
-  (swap! database assoc :link (into #{} (merge (vec (:link @database)) link))))
+(defn contains-link?
+  "Check if link is saved in db."
+  [link]
+  (-> (core/find-url {:url link})
+      first
+      boolean))
 
-(defn contains-link? [link]
-  (contains? (:link @database) link))
+(defn migrate [args]
+  (migrations/migrate args))

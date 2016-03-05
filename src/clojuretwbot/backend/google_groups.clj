@@ -34,7 +34,7 @@
   (doseq [k (filter #(or (re-matches #"\[ANN\].*" (:title %))
                          (re-matches #"ANN:.*" (:title %)))
                     (parse-rss url))]
-    ;; push to channel after init
+    ;; push to channel
     (put! channel k)))
 
 (defn find-ANN-in-clojure-list
