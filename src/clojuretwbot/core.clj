@@ -2,33 +2,31 @@
   (:require [clj-http.client    :as http]
             [clojure.data.json  :as json]
             [clojure.edn        :as edn]
-            [clojure.core.async :as async :refer [chan go-loop >! <! put!]]
             [clojure.data       :as data]
-            [cronj.core         :as cronj :refer [cronj]]
             [taoensso.timbre    :as timbre]
+            [cronj.core         :as cronj   :refer [cronj]]
+            [environ.core       :as environ :refer [env]]
+            [clojure.core.async :as async   :refer [chan go-loop >! <! put!]]
             ;; backends
-            [clojuretwbot.db   :as db]
-            [clojuretwbot.feed :as feed]))
+            [clojuretwbot.db     :as db]
+            [clojuretwbot.feed   :as feed]))
 
-;; save config here in edn format
-(def state (atom nil))
-
-;; read the config file
-(defn parse-config
-  "Parse user config file, all config in edn format."
-  [url]
-  (edn/read-string (slurp url)))
+;; Environment Variables
+;; TOKEN      ; telegram bot token get from bot father
+;; CHAT_ID    ; chat_id we want to send info to
+;; DATABASE   ; database file position
 
 (defn send-message!
-  ([message] (send-message! @state message nil))
-  ([message params] (send-message! @state message params))
-  ([{:keys [chat-id token]} message params]
-   (http/post (str "https://api.telegram.org/bot" token "/sendMessage")
-              {:content-type :json
-               :form-params (merge {:chat_id chat-id
-                                    :parse_mode "HTML"
-                                    :text message} params)})
-   (timbre/info (str "send-message! with :token " token " :chat-id " chat-id " :message " message))))
+  ([message] (send-message! message nil))
+  ([message params]
+   (let [token   (env :token)
+         chat-id (env :chat-id)]
+     (http/post (str "https://api.telegram.org/bot" token "/sendMessage")
+                {:content-type :json
+                 :form-params (merge {:chat_id chat-id
+                                      :parse_mode "HTML"
+                                      :text message} params)})
+     (timbre/info (str "send-message! with :token " token " :chat-id " chat-id " :message " message)))))
 
 (def scheduler
   (cronj :entries
@@ -56,9 +54,7 @@
   (feeds-dispatcher))
 
 ;; real entry point
-(defn start-app [config]
-  ;; we only modify state once
-  (reset! state config)
+(defn start-app []
   ;; start event loop for listen events
   (event-loop)
   ;; start the scheduler
@@ -70,10 +66,7 @@
   (cond (some #{"migrate" "rollback"} args)
         (do (db/migrate args) (System/exit 0))
         :else
-        (let [arg1 (nth args 0)]
-          (if arg1
-            (-> (parse-config arg1) (start-app))
-            (println "ERROR: Please specify config file.")))))
+        (start-app)))
 
 ;; migration from old archive.edn
 (comment
