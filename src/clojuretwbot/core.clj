@@ -1,20 +1,11 @@
 (ns clojuretwbot.core
   (:require [clj-http.client    :as http]
-            [clojure.data.json  :as json]
-            [clojure.edn        :as edn]
-            [clojure.data       :as data]
             [taoensso.timbre    :as timbre]
             [cronj.core         :as cronj   :refer [cronj]]
             [environ.core       :as environ :refer [env]]
             [clojure.core.async :as async   :refer [chan go-loop >! <! put!]]
-            ;; backends
-            [clojuretwbot.db     :as db]
-            [clojuretwbot.feed   :as feed]))
-
-;; Environment Variables
-;; TOKEN      ; telegram bot token get from bot father
-;; CHAT_ID    ; chat_id we want to send info to
-;; DATABASE   ; database file position
+            [clojuretwbot.db    :as db]
+            [clojuretwbot.feed  :as feed]))
 
 (defn send-message!
   ([message] (send-message! message nil))
@@ -39,9 +30,7 @@
   (go-loop []
     (let [{:keys [title link description] :as ch} (<! feed/channel)]
       ;; check if this link is already store in db, if not push to telegram
-      (timbre/info "tweet to telegram trigger!!")
       (when (not (db/contains-link? link))
-        (println (str "dispatch " link))
         (if (nil? description) ; some link can't be previewed by telegram
           (send-message! (str "<b>" title "</b>\n" link) {:disable_web_page_preview true})
           (send-message! (str link)))
@@ -59,10 +48,17 @@
   (event-loop)
   ;; start the scheduler
   (cronj/start! scheduler)
-  (println "start scheduler for checking planet.clojure"))
+  (timbre/info "start scheduler for clojuretwbot."))
 
-;; load config file and parse it
-(defn -main [& args]
+(defn -main
+  "The main function of clojuretwbot. When execute this with argument
+  `migrate' or `rollback', this application will do database migration/roollback.
+  You need to setup following environment variables to make this app work:
+
+  TOKEN     : telegram bot token get from bot father
+  CHAT_ID   : telegram chat room id bot will tweet to
+  DATABASE  : the database path you want to save to, ex: resources/database.db"
+  [& args]
   (cond (some #{"migrate" "rollback"} args)
         (do (db/migrate args) (System/exit 0))
         :else
