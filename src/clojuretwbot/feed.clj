@@ -2,6 +2,7 @@
   (:require  [clj-http.client        :as http]
              [taoensso.timbre        :as timbre]
              [feedparser-clj.core    :as feedparser]
+             [clojure.string         :as str]
              [clojure.core.async     :as async :refer [chan go-loop >! <! put!]]))
 
 ;; channel that store new feed info
@@ -45,10 +46,28 @@
                               (re-matches #"ANN:.*" (:title %)))))]
     (put! channel f)))
 
+(defn- clojure-post?
+  "Check if post contains keyword for clojure."
+  [url]
+  (let [html (fetch-html url)
+        keyword (-> (re-find #"(<meta\s*name=\"keywords\"\s*content=\")(.*)(\"\s*/>)" html)
+                    (nth 2))]
+    (str/includes? keyword "clojure")))
+
+(defn- fetch-coldnew-blog
+  "Fetch clojure/clojurescript post from coldnew's blog."
+  [feed-url]
+  (doseq [f (->> (parse-feed feed-url)
+                 (filter #(clojure-post? (:link %))))]
+    (put! channel f)))
+
+
 (defn fetch-all
   "Fetch all feeds we need and send to channel."
   []
   ;; planet clojure
   (fetch-feed "http://planet.clojure.in/atom.xml")
   ;; Clojure mailing-lits
-  (fetch-mailing-list "https://groups.google.com/forum/feed/clojure/msgs/rss_v2_0.xml"))
+  (fetch-mailing-list "https://groups.google.com/forum/feed/clojure/msgs/rss_v2_0.xml")
+  ;; coldnew's blog (chinese)
+  (fetch-coldnew-blog "http://coldnew.github.io/rss.xml"))
