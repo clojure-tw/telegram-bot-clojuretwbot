@@ -1,7 +1,7 @@
 (ns clojuretwbot.core
   (:require [clj-http.client    :as http]
             [taoensso.timbre    :as timbre]
-            [cronj.core         :as cronj   :refer [cronj]]
+            [hara.io.scheduler  :as sch]
             [environ.core       :as environ :refer [env]]
             [clojure.core.async :as async   :refer [chan go-loop >! <! put!]]
             [clojuretwbot.db    :as db]
@@ -20,11 +20,12 @@
      (timbre/info (str "send-message! with :token " token " :chat-id " chat-id " :message " message)))))
 
 (def scheduler
-  (cronj :entries
-         [;; every 30minute
-          {:id "feed-fetcher"
-           :handler (fn [_ _] (feed/fetch-all))
-           :schedule "0 /30 * * * * *"}]))
+  (sch/scheduler
+   ;; every 30 min send feeds link
+   {:feed-fetcher {:handler (fn [_ _] (feed/fetch-all))
+                   :schedule "0 /30 * * * * *"
+                   :params nil}
+    }))
 
 (defn feeds-dispatcher []
   (go-loop []
@@ -47,7 +48,7 @@
   ;; start event loop for listen events
   (event-loop)
   ;; start the scheduler
-  (cronj/start! scheduler)
+  (sch/start! scheduler)
   (timbre/info "start scheduler for clojuretwbot."))
 
 (defn -main

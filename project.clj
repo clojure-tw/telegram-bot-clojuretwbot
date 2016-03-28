@@ -9,13 +9,14 @@
                  [cheshire "5.5.0"]
                  [org.clojars.scsibug/feedparser-clj "0.4.0"]
                  [org.clojure/data.json "0.2.6"]
-                 [im.chit/cronj "1.4.4"]
                  [com.cemerick/url "0.1.1"]
                  [com.taoensso/timbre "4.3.1"]
                  [yesql "0.5.2"]
                  [org.xerial/sqlite-jdbc "3.8.11.2"]
                  [migratus "0.8.13"]
-                 [environ "1.0.2"]]
+                 [environ "1.0.2"]
+                 [im.chit/hara.io.scheduler "2.2.17"]
+                 [im.chit/hara.time.joda "2.2.17"]]
 
   :plugins [[migratus-lein "0.2.6"]]
 
