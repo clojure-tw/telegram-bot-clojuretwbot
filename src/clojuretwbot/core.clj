@@ -7,6 +7,15 @@
             [clojuretwbot.db    :as db]
             [clojuretwbot.feed  :as feed]))
 
+(defn valid-link?
+  "Check if url is valid link. We hate 404 error."
+  [url]
+  (try (= 200
+          (-> (http/get url  {:insecure? true})
+              :status))
+       (catch Exception e
+         false)))
+
 (defn send-message!
   ([message] (send-message! message nil))
   ([message params]
@@ -31,7 +40,9 @@
   (go-loop []
     (let [{:keys [title link description] :as ch} (<! feed/channel)]
       ;; check if this link is already store in db, if not push to telegram
-      (when (not (db/contains-link? link))
+      ;; if link is not valid, ignore it.
+      (when (and (not (db/contains-link? link))
+                 (valid-link? link))
         (if (nil? description) ; some link can't be previewed by telegram
           (send-message! (str "<b>" title "</b>\n" link) {:disable_web_page_preview true})
           (send-message! (str link)))
