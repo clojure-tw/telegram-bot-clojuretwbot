@@ -61,6 +61,15 @@
                  (filter #(clojure-post? (:link %))))]
     (put! channel f)))
 
+(defn- fetch-fnil-net
+  "Fetch http://blog.fnil.net"
+  [feed-url]
+  (doseq [f (->> (parse-feed feed-url)
+                 (filter #(-> (fetch-html (:link %))
+                              ((fn [x] (re-find #"(<a\s*class='category'\s*href=.*'>)(.*)(</a>)" x)))
+                              (nth 2)
+                              (str/includes? "clojure"))))]
+    (put! channel f)))
 
 (defn fetch-all
   "Fetch all feeds we need and send to channel."
@@ -70,4 +79,6 @@
   ;; Clojure mailing-lits
   (fetch-mailing-list "https://groups.google.com/forum/feed/clojure/msgs/rss_v2_0.xml")
   ;; coldnew's blog (chinese)
-  (fetch-coldnew-blog "http://coldnew.github.io/rss.xml"))
+  (fetch-coldnew-blog "http://coldnew.github.io/rss.xml")
+  ;; 庄周梦蝶 (chinese)
+  (fetch-fnil-net "http://blog.fnil.net/atom.xml"))
