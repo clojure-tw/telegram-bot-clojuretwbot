@@ -31,10 +31,20 @@ if [ -z $OPENSHIFT_PASSWORD ]; then
 fi
 
 # Login to openshift
-echo "no" | rhc setup --server ${OPENSHIFT_SERVER}  -l ${OPENSHIFT_ACCOUNT} -p ${OPENSHIFT_PASSWORD}
+# Q1: Generate a token now? (yes|no) no
+# Q2: Upload ssh key now? (yes|no) yes
+# Q3: Provide a name for this key: cikey
+
+echo -e "no\nyes\ncikey" | rhc setup --server ${OPENSHIFT_SERVER}  -l ${OPENSHIFT_ACCOUNT} -p ${OPENSHIFT_PASSWORD} > /dev/null 2>&1
 
 # deploy
-rhc app-deploy master -a ${OPENSHIFT_APPNAME}
+# Q1: ask for password: $OPENSHIFT_PASSWORD
+echo -e "$OPENSHIFT_PASSWORD" | rhc app-deploy master -a ${OPENSHIFT_APPNAME}
 
 # After all done, leave openshift
 rhc logout
+
+# kill the ssh key when in CI
+if [ !  -z $CI ]; then
+    rm -rf ~/.ssh
+fi
