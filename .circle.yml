@@ -1,0 +1,27 @@
+general:
+  branches:
+    ignore:
+      - gh-pages
+
+machine:
+  timezone: Asia/Taipei
+  java:
+    version: oraclejdk8
+  environment:
+    DATABASE: "resources/database.db"
+    TOKEN:    ""
+    CHAT_ID:  ""
+
+dependencies:
+  pre:
+    - wget -O lein https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein
+    - chmod 755 lein
+    - ./lein -v
+    - ./lein deps
+  cache_directories:
+    - ~/.m2
+    - ~/.lein
+
+test:
+  override:
+    - ./lein test
