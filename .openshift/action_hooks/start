@@ -25,4 +25,4 @@ $OPENSHIFT_DATA_DIR/bin/lein deps
 $OPENSHIFT_DATA_DIR/bin/lein run -- migrate
 
 # Start the aplication
-nohup $OPENSHIFT_REPO_DIR/bin/lein trampoline run 2>&1 | /usr/bin/logshifter -tag clojuretwbot &
+nohup $OPENSHIFT_DATA_DIR/bin/lein trampoline run 2>&1 | /usr/bin/logshifter -tag clojuretwbot &

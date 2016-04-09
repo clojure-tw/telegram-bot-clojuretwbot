@@ -1,9 +1,9 @@
 # clojuretwbot - A telegram bot for clojure.tw channel
-[![Build Status](https://travis-ci.org/clojure-tw/telegram-bot-clojuretwbot.svg?branch=master)](https://travis-ci.org/clojure-tw/telegram-bot-clojuretwbot)
+[![Circle CI](https://circleci.com/gh/clojure-tw/telegram-bot-clojuretwbot.svg?style=svg)](https://circleci.com/gh/clojure-tw/telegram-bot-clojuretwbot)
 [![Dependencies Status](https://jarkeeper.com/clojure-tw/telegram-bot-clojuretwbot/status.svg)](https://jarkeeper.com/clojure-tw/telegram-bot-clojuretwbot)
 [![License](http://img.shields.io/badge/license-GPL-blue.svg?style=flat)](http://www.opensource.org/licenses/gpl-license.html)
 
-This is a simple telegram bot designed for clojure.tw community.
+This is a special telegram bot designed for clojure.tw community.
 
 ## What this bot do ?
 
@@ -32,8 +32,29 @@ If you don't have any database, you need to run following command first
 then start the bot
 
 ```bash
-   TOKEN="telegram bot token" CHAT_ID="telegram room id" DATABASE="resources/database.db" lein run 
+   TOKEN="telegram bot token" CHAT_ID="telegram room id" DATABASE="resources/database.db" lein run
 ```
+
+## Deploy on OpenShift
+
+Our bot is deploy on [openshift](https://openshift.redhat.com), to do so, you need to setup needed variables by *rhc* command:
+
+```bash
+   rhc env set TOKEN="TELEGRAM BOT TOKEN" CHAT_ID="TELEGRAM CHAT ID" DATABASE="Bot database position" -a App_Name
+```
+
+After environment variables setup, you can use following command to make sure all variables is ready 
+
+(NOTE: following info are just examples.)
+
+```bash
+$ rhc env list clojuretwbot
+CHAT_ID=-99999999
+DATABASE=/var/lib/openshift/5708cdb089f5cfdacd000136/app-root/data/database.db
+TOKEN=999992998:ABCDEfghijkl-mnnDi2HLgsdIT9Zc0NWTLz
+```
+
+For more info, please refer [openshift doc: Using Environment Variables](https://developers.openshift.com/managing-your-applications/environment-variables.html)
 
 ## License
 
