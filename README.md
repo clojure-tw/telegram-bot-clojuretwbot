@@ -43,18 +43,18 @@ Our bot is deploy on [openshift](https://openshift.redhat.com), to do so, you ne
    rhc env set TOKEN="TELEGRAM BOT TOKEN" CHAT_ID="TELEGRAM CHAT ID" DATABASE="Bot database position" -a App_Name
 ```
 
-After environment variables setup, you can use following command to make sure all variables is ready 
+After environment variables setup, you can use following command to make sure all variables is ready
 
 (NOTE: following info are just examples.)
 
 ```bash
-$ rhc env list clojuretwbot
+$ rhc env list App_Name
 CHAT_ID=-99999999
 DATABASE=/var/lib/openshift/5708cdb089f5cfdacd000136/app-root/data/database.db
 TOKEN=999992998:ABCDEfghijkl-mnnDi2HLgsdIT9Zc0NWTLz
 ```
 
-For more info, please refer [openshift doc: Using Environment Variables](https://developers.openshift.com/managing-your-applications/environment-variables.html)
+For more info, please refer [openshift doc](https://developers.openshift.com/managing-your-applications/environment-variables.html)
 
 ## License
 
