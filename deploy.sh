@@ -31,7 +31,7 @@ if [ -z $OPENSHIFT_PASSWORD ]; then
 fi
 
 # Login to openshift
-rhc setup --server ${OPENSHIFT_SERVER}  -l ${OPENSHIFT_ACCOUNT} -p ${OPENSHIFT_PASSWORD}
+echo "no" | rhc setup --server ${OPENSHIFT_SERVER}  -l ${OPENSHIFT_ACCOUNT} -p ${OPENSHIFT_PASSWORD}
 
 # deploy
 rhc app-deploy master -a ${OPENSHIFT_APPNAME}
