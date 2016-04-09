@@ -16,7 +16,8 @@
                  [migratus "0.8.13"]
                  [environ "1.0.2"]
                  [im.chit/hara.io.scheduler "2.2.17"]
-                 [im.chit/hara.time.joda "2.2.17"]]
+                 [im.chit/hara.time.joda "2.2.17"]
+                 [enlive "1.1.6"]]
 
   :plugins [[migratus-lein "0.2.6"]]
 

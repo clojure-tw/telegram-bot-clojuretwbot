@@ -1,5 +1,6 @@
 (ns clojuretwbot.feed
   (:require  [clj-http.client        :as http]
+             [net.cgrand.enlive-html :as html]
              [taoensso.timbre        :as timbre]
              [feedparser-clj.core    :as feedparser]
              [clojure.string         :as str]
@@ -17,12 +18,21 @@
        (catch Exception e
          (timbre/warn (.getMessage e)))))
 
+(defn- parse-meta
+  "Parse HTML content's metadata."
+  [html property]
+  (-> html
+      (java.io.StringReader.)
+      (html/html-resource)
+      (html/select [[:meta (html/attr= :property property)]])
+      (first)
+      (get-in [:attrs :content])))
+
 (defn- parse-description
   "Parse feed's og:description info, set :description to nil if not exist."
   [info]
   (let [html (or (fetch-html (:link info)) "")
-        description (-> (re-find #"(<meta\s*property=\"og:description\"\s*content=\")(.*)(\">)" html)
-                        (nth 2))]
+        description (parse-meta html "og:description")]
     (merge info {:description description})))
 
 (defn- parse-feed
