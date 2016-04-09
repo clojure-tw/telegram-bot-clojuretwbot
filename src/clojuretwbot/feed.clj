@@ -38,33 +38,33 @@
   (doseq [f (parse-feed feed-url)]
     (put! channel f)))
 
+(defn- fetch-planet-clojure
+  "Fetch feeds from http://planet.clojure.in"
+  []
+  (fetch-feed "http://planet.clojure.in/atom.xml"))
+
 (defn- fetch-mailing-list
-  "Fetch mailing-list from google-group."
-  [feed-url]
-  (doseq [f (->> (parse-feed feed-url)
+  "Fetch clojure mailing-list from google-group."
+  []
+  (doseq [f (->> (parse-feed "https://groups.google.com/forum/feed/clojure/msgs/rss_v2_0.xml")
                  (filter #(or (re-matches #"\[ANN\].*" (:title %))
                               (re-matches #"ANN:.*" (:title %)))))]
     (put! channel f)))
 
-(defn- clojure-post?
-  "Check if post contains keyword for clojure."
-  [url]
-  (let [html (fetch-html url)
-        keyword (-> (re-find #"(<meta\s*name=\"keywords\"\s*content=\")(.*)(\"\s*/>)" html)
-                    (nth 2))]
-    (str/includes? keyword "clojure")))
-
 (defn- fetch-coldnew-blog
-  "Fetch clojure/clojurescript post from coldnew's blog."
-  [feed-url]
-  (doseq [f (->> (parse-feed feed-url)
-                 (filter #(clojure-post? (:link %))))]
+  "Fetch clojure/clojurescript post from http://coldnew.github.io/rss.xml."
+  []
+  (doseq [f (->> (parse-feed "http://coldnew.github.io/rss.xml")
+                 (filter #(-> (fetch-html (:link %))
+                              ((fn [x] (re-find #"(<meta\s*name=\"keywords\"\s*content=\")(.*)(\"\s*/>)")))
+                              (nth 2)
+                              (str/includes? "clojure"))))]
     (put! channel f)))
 
 (defn- fetch-fnil-net
   "Fetch http://blog.fnil.net"
-  [feed-url]
-  (doseq [f (->> (parse-feed feed-url)
+  []
+  (doseq [f (->> (parse-feed "http://blog.fnil.net/atom.xml")
                  (filter #(-> (fetch-html (:link %))
                               ((fn [x] (re-find #"(<a\s*class='category'\s*href=.*'>)(.*)(</a>)" x)))
                               (nth 2)
@@ -75,10 +75,10 @@
   "Fetch all feeds we need and send to channel."
   []
   ;; planet clojure
-  (fetch-feed "http://planet.clojure.in/atom.xml")
+  (feetch-planet-clojure)
   ;; Clojure mailing-lits
-  (fetch-mailing-list "https://groups.google.com/forum/feed/clojure/msgs/rss_v2_0.xml")
+  (fetch-mailing-list)
   ;; coldnew's blog (chinese)
-  (fetch-coldnew-blog "http://coldnew.github.io/rss.xml")
+  (fetch-coldnew-blog)
   ;; 庄周梦蝶 (chinese)
-  (fetch-fnil-net "http://blog.fnil.net/atom.xml"))
+  (fetch-fnil-net))
