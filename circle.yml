@@ -14,6 +14,7 @@ machine:
 
 dependencies:
   pre:
+    - gem which rhc || gem install -V rhc
     - wget -O lein https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein
     - chmod 755 lein
     - ./lein -v
