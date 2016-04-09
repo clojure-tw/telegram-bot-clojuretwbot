@@ -75,7 +75,7 @@
   "Fetch all feeds we need and send to channel."
   []
   ;; planet clojure
-  (feetch-planet-clojure)
+  (fetch-planet-clojure)
   ;; Clojure mailing-lits
   (fetch-mailing-list)
   ;; coldnew's blog (chinese)
