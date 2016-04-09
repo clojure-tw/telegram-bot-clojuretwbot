@@ -26,7 +26,7 @@
     (merge info {:description description})))
 
 (defn- parse-feed
-  "Parse feed url to [{:link :title :description} array."
+  "Parse feed url to [{:link :title :description}] array."
   [url]
   (let [feed (feedparser/parse-feed url)
         info (map #(select-keys % [:title :link]) (:entries feed))]
