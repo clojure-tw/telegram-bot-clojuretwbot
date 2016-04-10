@@ -1,13 +1,24 @@
-(ns clojuretwbot.feed
-  (:require  [clj-http.client        :as http]
-             [net.cgrand.enlive-html :as html]
-             [taoensso.timbre        :as timbre]
-             [feedparser-clj.core    :as feedparser]
-             [clojure.string         :as str]
-             [clojure.core.async     :as async :refer [chan go-loop >! <! put!]]))
+(ns clojuretwbot.scheduler.feed-poster
+  (:require [clj-http.client :as http]
+            [clojure.core.async :as async :refer [<! chan go-loop put!]]
+            [clojure.string :as str]
+            [clojuretwbot.api.telegram :as telegram]
+            [clojuretwbot.db :as db]
+            [feedparser-clj.core :as feedparser]
+            [net.cgrand.enlive-html :as html]
+            [taoensso.timbre :as timbre]))
 
 ;; channel that store new feed info
-(def channel (chan))
+(def ^:private channel (chan))
+
+(defn- valid-link?
+  "Check if url is valid link. We hate 404 error."
+  [url]
+  (try (= 200
+          (-> (http/get url  {:insecure? true})
+              :status))
+       (catch Exception e
+         false)))
 
 ;; since we'll send feed url to telegram, some feed doesn't has og:drecription tag
 (defn- fetch-html
@@ -80,6 +91,20 @@
                               (nth 2)
                               (str/includes? "clojure"))))]
     (put! channel f)))
+
+;; Async dispatcher
+(go-loop []
+  (let [{:keys [title link description] :as ch} (<! channel)]
+    ;; check if this link is already store in db, if not push to telegram
+    ;; if link is not valid, ignore it.
+    (when (and (not (db/contains-link? link))
+               (valid-link? link))
+      (if (nil? description) ; some link can't be previewed by telegram
+        (telegram/send-message! (str "<b>" title "</b>\n" link) {:disable_web_page_preview true})
+        (telegram/send-message! (str link)))
+      ;; Add link to db
+      (db/add-link link)))
+  (recur))
 
 (defn fetch-all
   "Fetch all feeds we need and send to channel."
