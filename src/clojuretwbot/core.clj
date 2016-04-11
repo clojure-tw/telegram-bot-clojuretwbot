@@ -1,11 +1,14 @@
 (ns clojuretwbot.core
   (:require [clojuretwbot.scheduler :as scheduler]
-            [clojuretwbot.db :as db]))
+            [clojuretwbot.db :as db]
+            [clojuretwbot.server :as server]))
 
 ;; real entry point
 (defn start-app []
   ;; start the scheduler
-  (scheduler/start))
+  (scheduler/start)
+  ;; start web server
+  (server/start))
 
 (defn -main
   "The main function of clojuretwbot. When execute this with argument

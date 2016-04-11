@@ -17,7 +17,12 @@
                  [environ "1.0.2"]
                  [im.chit/hara.io.scheduler "2.2.17"]
                  [im.chit/hara.time.joda "2.2.17"]
-                 [enlive "1.1.6"]]
+                 [enlive "1.1.6"]
+                 [ring "1.4.0"]
+                 [ring/ring-defaults "0.2.0"]
+                 [bk/ring-gzip "0.1.1"]
+                 [ring.middleware.logger "0.5.0"]
+                 [compojure "1.5.0"]]
 
   :plugins [[migratus-lein "0.2.6"]]
 
