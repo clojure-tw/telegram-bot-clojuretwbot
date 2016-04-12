@@ -52,7 +52,8 @@ git remote add openshift ${OPENSHIFT_REPO}
 [[ ! -e "$(git rev-parse --git-dir)/shallow" ]] || git fetch --unshallow
 
 # deploy master branch only
-git push openshift master -f
+# Note: we force update openshift here
+git push -u openshift --all -f
 
 # After all done, leave openshift
 rhc logout
