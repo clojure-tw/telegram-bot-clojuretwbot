@@ -1,0 +1,9 @@
+{ ;; telegram bot token
+ :token "YOUR TELEGRAM BOT TOKEN"
+
+ ;; telegram room chat_id
+ :chat-id "YOUR ROOM ID WHICH BOT WILL SEND TO"
+
+ ;; sqlite database position, for openshift, you can set it to
+ ;;   (str (System/getenv "OPENSHIFT_DATA_DIR") "/database.db")
+ :database "YOUR DATABASE POSITION"}
