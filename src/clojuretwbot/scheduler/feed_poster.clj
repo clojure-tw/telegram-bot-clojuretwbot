@@ -68,8 +68,9 @@
   "Fetch clojure mailing-list from google-group."
   []
   (doseq [f (->> (parse-feed "https://groups.google.com/forum/feed/clojure/msgs/rss_v2_0.xml")
-                 (filter #(or (re-matches #"\[ANN\].*" (:title %))
-                              (re-matches #"ANN:.*" (:title %)))))]
+                 (filter #(or (re-matches #"\[ANN\].*"  (:title %))
+                              (re-matches #"\[ANNs\].*" (:title %))
+                              (re-matches #"ANN:.*"     (:title %)))))]
     (put! channel f)))
 
 (defn- fetch-coldnew-blog
