@@ -93,6 +93,13 @@
                               (str/includes? "clojure"))))]
     (put! channel f)))
 
+(defn- fetch-clojure-china
+  "Fetch Clojure Weekly post from Clojure China. http://clojure-china.org."
+  []
+  (doseq [f (->> (parse-feed "http://clojure-china.org/posts.rss")
+                 (filter #(re-matches #"Clojure Weekly\s.*"  (:title %))))]
+    (put! channel f)))
+
 ;; Async dispatcher
 (go-loop []
   (let [{:keys [title link description] :as ch} (<! channel)]
@@ -117,4 +124,8 @@
   ;; coldnew's blog (chinese)
   (fetch-coldnew-blog)
   ;; 庄周梦蝶 (chinese)
-  (fetch-fnil-net))
+  (fetch-fnil-net)
+  ;; Clojure China
+  ;; TODO: should we enable this ?
+  ;; (fetch-clojure-china)
+  )
