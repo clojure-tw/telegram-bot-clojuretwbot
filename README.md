@@ -2,6 +2,7 @@
 [![Circle CI](https://circleci.com/gh/clojure-tw/telegram-bot-clojuretwbot.svg?style=svg)](https://circleci.com/gh/clojure-tw/telegram-bot-clojuretwbot)
 [![Dependencies Status](https://jarkeeper.com/clojure-tw/telegram-bot-clojuretwbot/status.svg)](https://jarkeeper.com/clojure-tw/telegram-bot-clojuretwbot)
 [![License](http://img.shields.io/badge/license-GPL-blue.svg?style=flat)](http://www.opensource.org/licenses/gpl-license.html)
+[![Stories in Ready](https://badge.waffle.io/clojure-tw/telegram-bot-clojuretwbot.png?label=ready&title=Ready)](http://waffle.io/clojure-tw/telegram-bot-clojuretwbot)
 
 This is a special telegram bot designed for clojure.tw community.
 
