@@ -7,7 +7,8 @@
   (sch/scheduler
    ;; every 30 min send feeds link
    {:feed-fetcher {:handler (fn [_ _] (feed/fetch-all))
-                   :schedule "0 /30 * * * * *"
+                   ;; :schedule "0 /30 * * * * *"
+                   :schedule "/2 * * * * * *"
                    :params nil}
     }))
 

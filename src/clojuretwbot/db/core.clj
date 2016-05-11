@@ -4,7 +4,7 @@
 
 (def conn {:classname   "org.sqlite.JDBC"
            :subprotocol "sqlite"
-           :subname     (env :database)
+           :subname     "/Volumes/ramdisk/telegram-bot-clojuretwbot/database.db" ;; (env :database)
            :user        "clojuretwbot"
            :password    ""})
 

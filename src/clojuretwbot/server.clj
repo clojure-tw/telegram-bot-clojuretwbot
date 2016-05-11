@@ -1,30 +1,41 @@
 (ns clojuretwbot.server
-  (:require [clojure.java.io :as io]
-            [compojure.core :refer [ANY GET PUT POST DELETE defroutes]]
-            [compojure.route :refer [resources]]
+  (:require [compojure.core :refer [routes defroutes wrap-routes]]
+            [compojure.route :as route :refer [resources]]
+            [compojure.handler :as handler]
             [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
             [ring.middleware.gzip :refer [wrap-gzip]]
             [ring.middleware.logger :refer [wrap-with-logger]]
-            [environ.core :refer [env]]
+            [prone.middleware :refer [wrap-exceptions]]
+            [coldnew.config :refer [conf]]
             [ring.adapter.jetty :refer [run-jetty]]
-            [taoensso.timbre :as timbre])
+            [taoensso.timbre :as timbre]
+            [clojuretwbot.routes.api  :refer [api-routes]]
+            [clojuretwbot.routes.site :refer [site-routes]])
   (:gen-class))
 
-(defroutes routes
-  (GET "/" _
-       {:status 200
-        :headers {"Content-Type" "text/html; charset=utf-8"}
-        :body (io/input-stream (io/resource "public/index.html"))})
-  (resources "/"))
+(def enable-debug?
+  (= "true" (conf :enable-debug)))
 
-(def http-handler
-  (-> routes
-      (wrap-defaults api-defaults)
+(defroutes not-found
+  (route/not-found "404"))
+
+(defroutes app-routes
+  site-routes
+  api-routes
+  not-found)
+
+(defroutes http-handler
+  (-> (handler/site app-routes)
       wrap-with-logger
-      wrap-gzip))
+      wrap-gzip
+      wrap-exceptions
+      (cond-> enable-debug? wrap-exceptions)))
 
 (defn start [& [port]]
-  (let [port (Integer. (or port (env :port) 8080))
+  (let [port (Integer. (or port (conf :port) 8080))
         host (or (System/getenv "OPENSHIFT_DIY_IP") "127.0.0.1")]
-    (timbre/info (str "start ring-handler on port " port))
+    (timbre/info "start ring-handler on port " port)
     (run-jetty http-handler {:host host :port port})))
+
+(defn stop [this]
+  (.stop this))

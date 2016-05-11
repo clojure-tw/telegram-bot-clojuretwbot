@@ -22,7 +22,13 @@
                  [ring/ring-defaults "0.2.0"]
                  [bk/ring-gzip "0.1.1"]
                  [ring.middleware.logger "0.5.0"]
-                 [compojure "1.5.0"]]
+                 [compojure "1.5.0"]
+                 [metosin/compojure-api "1.1.0"]
+                 [prismatic/schema "1.1.1"]
+                 [metosin/ring-http-response "0.6.5"]
+                 [mount "0.1.11-SNAPSHOT"]
+                 [coldnew/config "1.2.0"]
+                 [prone "1.1.1"]]
 
   :plugins [[migratus-lein "0.2.6"]]
 

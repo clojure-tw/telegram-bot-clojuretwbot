@@ -1,14 +1,30 @@
 (ns clojuretwbot.core
   (:require [clojuretwbot.scheduler :as scheduler]
             [clojuretwbot.db :as db]
-            [clojuretwbot.server :as server]))
+            [clojuretwbot.config :refer [env]]
+            [clojuretwbot.server :as server]
+            [taoensso.timbre :as timbre]
+            [mount.core :as mount]))
 
-;; real entry point
+(mount/defstate ^{:on-reload :noop}
+  schele-server
+  :start (scheduler/start)
+  :stop  (scheduler/stop))
+
+(mount/defstate ^{:on-reload :noop}
+  web-server
+  :start (server/start)
+  :stop  (server/stop web-server))
+
+(defn stop-app []
+  (doseq [component (:stopped (mount/stop))]
+    (timbre/info component "stopped"))
+  (shutdown-agents))
+
 (defn start-app []
-  ;; start the scheduler
-  (scheduler/start)
-  ;; start web server
-  (server/start))
+  (doseq [component (:started (mount/start))]
+    (timbre/info component "started"))
+  (.addShutdownHook (Runtime/getRuntime) (Thread. stop-app)))
 
 (defn -main
   "The main function of clojuretwbot. When execute this with argument
