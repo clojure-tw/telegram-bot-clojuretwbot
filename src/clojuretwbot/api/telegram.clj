@@ -1,13 +1,13 @@
 (ns clojuretwbot.api.telegram
   (:require [clj-http.client :as http]
-            [environ.core :as environ :refer [env]]
+            [coldnew.config :refer [conf]]
             [taoensso.timbre :as timbre]))
 
 ;; telegram token from `TOKEN' environment vairable
-(def ^:private token (env :token))
+(def ^:private token (conf :token))
 
 ;; telegram token from `CHAT_ID' environment vairable
-(def ^:private chat-id (env :chat-id))
+(def ^:private chat-id (conf :chat-id))
 
 (defn send-message!
   ([message] (send-message! message nil))

@@ -1,10 +1,10 @@
 (ns clojuretwbot.db.core
   (:require [yesql.core   :refer [defqueries]]
-            [environ.core :refer [env]]))
+            [coldnew.config :refer [conf]]))
 
 (def conn {:classname   "org.sqlite.JDBC"
            :subprotocol "sqlite"
-           :subname     "/Volumes/ramdisk/telegram-bot-clojuretwbot/database.db" ;; (env :database)
+           :subname     (conf :database)
            :user        "clojuretwbot"
            :password    ""})
 
