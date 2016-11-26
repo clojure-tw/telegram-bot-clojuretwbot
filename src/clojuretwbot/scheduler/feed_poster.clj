@@ -100,6 +100,11 @@
                  (filter #(re-matches #"Clojure Weekly\s.*"  (:title %))))]
     (put! channel f)))
 
+(defn- fetch-clojuretw-weekly
+  "Fetch ClojureTW Weekly News. https://clojure.tw/weekly"
+  []
+  (fetch-feed "https://clojure.tw/weekly/feed.xml"))
+
 ;; Async dispatcher
 (go-loop []
   (let [{:keys [title link description] :as ch} (<! channel)]
@@ -121,6 +126,8 @@
   (fetch-planet-clojure)
   ;; Clojure mailing-lits
   (fetch-mailing-list)
+  ;; ClojureTW weekly news
+  (fetch-clojuretw-weekly)
   ;; coldnew's blog (chinese)
   (fetch-coldnew-blog)
   ;; 庄周梦蝶 (chinese)
