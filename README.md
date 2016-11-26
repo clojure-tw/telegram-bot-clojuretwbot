@@ -12,6 +12,7 @@ This is a special telegram bot designed for clojure.tw community.
 2. Fetch and send any news in [Clojure Mailing-list](https://groups.google.com/forum/#!forum/clojure) which start with *[ANN]* to telegram.
 3. Fetch some Chinese/Taiwanese blog post about clojure/clojurescript
    - [coldnew's blog](https://coldnew.github.io)
+   - [ClojureTW Weekly](https://clojure.tw/weekly)
    - [庄周梦蝶](http://blog.fnil.net/)
 
 ## Screenshots
