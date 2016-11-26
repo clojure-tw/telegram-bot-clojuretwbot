@@ -11,6 +11,8 @@ machine:
     DATABASE: "resources/database.db"
     TOKEN:    ""
     CHAT_ID:  ""
+  ruby:
+    version: ruby-2.3.0
 
 dependencies:
   pre:
