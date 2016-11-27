@@ -7,7 +7,7 @@
                  [org.clojure/core.async "0.2.395"]
                  [clj-http "3.4.1"]
                  [cheshire "5.6.3"]
-                 [org.clojars.scsibug/feedparser-clj "0.4.0"]
+                 [org.clojars.smallrivers/feedparser-clj "0.5.1"]
                  [org.clojure/data.json "0.2.6"]
                  [com.cemerick/url "0.1.1"]
                  [com.taoensso/timbre "4.7.4"]

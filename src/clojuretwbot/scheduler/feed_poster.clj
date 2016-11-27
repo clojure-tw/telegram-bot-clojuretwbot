@@ -44,7 +44,10 @@
   [info]
   (let [html (or (fetch-html (:link info)) "")
         description (parse-meta html "og:description")]
-    (merge info {:description description})))
+    ;; (merge info {:description description})
+    {:title       (str/trim (or (:title info) ""))
+     :link        (str/trim (or (:link  info) ""))
+     :description (str/trim (or description   ""))}))
 
 (defn- parse-feed
   "Parse feed url to [{:link :title :description}] array."
@@ -85,7 +88,7 @@
     ;; if link is not valid, ignore it.
     (when (and (not (db/contains-link? link))
                (valid-link? link))
-      (if (nil? description) ; some link can't be previewed by telegram
+      (if (empty? description) ; some link can't be previewed by telegram
         (telegram/send-message! (str "<b>" title "</b>\n" link) {:disable_web_page_preview true})
         (telegram/send-message! (str link)))
       ;; Add link to db
