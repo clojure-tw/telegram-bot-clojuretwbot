@@ -1,6 +1,6 @@
 (ns clojuretwbot.scheduler.feed-poster
   (:require [clj-http.client :as http]
-            [clojure.core.async :as async :refer [<! chan go-loop put!]]
+            [clojure.core.async :as async :refer [<! chan go-loop put! >! go]]
             [clojure.string :as str]
             [clojuretwbot.api.telegram :as telegram]
             [clojuretwbot.db :as db]
@@ -56,8 +56,8 @@
 (defn- fetch-feed
   "Fetch feeds we need and send to channel."
   [feed-url]
-  (doseq [f (parse-feed feed-url)]
-    (put! channel f)))
+  (go (doseq [f (parse-feed feed-url)]
+        (>! channel f))))
 
 (defn- fetch-planet-clojure
   "Fetch feeds from http://planet.clojure.in"
@@ -67,38 +67,11 @@
 (defn- fetch-mailing-list
   "Fetch clojure mailing-list from google-group."
   []
-  (doseq [f (->> (parse-feed "https://groups.google.com/forum/feed/clojure/msgs/rss_v2_0.xml")
-                 (filter #(or (re-matches #"\[ANN\].*"  (:title %))
-                              (re-matches #"\[ANNs\].*" (:title %))
-                              (re-matches #"ANN:.*"     (:title %)))))]
-    (put! channel f)))
-
-(defn- fetch-coldnew-blog
-  "Fetch clojure/clojurescript post from http://coldnew.github.io/rss.xml."
-  []
-  (doseq [f (->> (parse-feed "http://coldnew.github.io/rss.xml")
-                 (filter #(-> (fetch-html (:link %))
-                              ((fn [x] (re-find #"(<meta\s*name=\"keywords\"\s*content=\")(.*)(\"\s*/>)")))
-                              (nth 2)
-                              (str/includes? "clojure"))))]
-    (put! channel f)))
-
-(defn- fetch-fnil-net
-  "Fetch http://blog.fnil.net"
-  []
-  (doseq [f (->> (parse-feed "http://blog.fnil.net/atom.xml")
-                 (filter #(-> (fetch-html (:link %))
-                              ((fn [x] (re-find #"(<a\s*class='category'\s*href=.*'>)(.*)(</a>)" x)))
-                              (nth 2)
-                              (str/includes? "clojure"))))]
-    (put! channel f)))
-
-(defn- fetch-clojure-china
-  "Fetch Clojure Weekly post from Clojure China. http://clojure-china.org."
-  []
-  (doseq [f (->> (parse-feed "http://clojure-china.org/posts.rss")
-                 (filter #(re-matches #"Clojure Weekly\s.*"  (:title %))))]
-    (put! channel f)))
+  (go (doseq [f (->> (parse-feed "https://groups.google.com/forum/feed/clojure/msgs/rss_v2_0.xml")
+                     (filter #(or (re-matches #"\[ANN\].*"  (:title %))
+                                  (re-matches #"\[ANNs\].*" (:title %))
+                                  (re-matches #"ANN:.*"     (:title %)))))]
+        (>! channel f))))
 
 (defn- fetch-clojuretw-weekly
   "Fetch ClojureTW Weekly News. https://clojure.tw/weekly"
@@ -127,12 +100,4 @@
   ;; Clojure mailing-lits
   (fetch-mailing-list)
   ;; ClojureTW weekly news
-  (fetch-clojuretw-weekly)
-  ;; coldnew's blog (chinese)
-  (fetch-coldnew-blog)
-  ;; 庄周梦蝶 (chinese)
-  (fetch-fnil-net)
-  ;; Clojure China
-  ;; TODO: should we enable this ?
-  ;; (fetch-clojure-china)
-  )
+  (fetch-clojuretw-weekly))
