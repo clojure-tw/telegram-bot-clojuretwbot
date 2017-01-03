@@ -81,6 +81,11 @@
   []
   (fetch-feed "https://clojure.tw/weekly/feed.xml"))
 
+(defn- fetch-subreddit-clojure
+  "Fetch Clojure subreddit. https://www.reddit.com/r/Clojure"
+  []
+  (fetch-feed "https://www.reddit.com/r/Clojure.rss"))
+
 ;; Async dispatcher
 (go-loop []
   (let [{:keys [title link description] :as ch} (<! channel)]
@@ -103,4 +108,6 @@
   ;; Clojure mailing-lits
   (fetch-mailing-list)
   ;; ClojureTW weekly news
-  (fetch-clojuretw-weekly))
+  (fetch-clojuretw-weekly)
+  ;; Clojure subreddit
+  (fetch-subreddit-clojure))
