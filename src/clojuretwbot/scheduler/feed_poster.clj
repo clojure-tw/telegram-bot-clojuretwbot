@@ -87,8 +87,7 @@
   (go (doseq [f (->> (parse-feed "https://www.reddit.com/r/Clojure.rss")
                      (map (fn [item] 
                            (update-in item [:link]
-                            (fn [url] (str "https://redd.it/" (get (str/split url #"\/") 6)))))
-                       result))]
+                            (fn [url] (str "https://redd.it/" (get (str/split url #"\/") 6)))))))]
        (>! channel f))))
              
 ;; Async dispatcher
