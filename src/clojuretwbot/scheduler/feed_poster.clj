@@ -27,7 +27,7 @@
   (try (-> (http/get url  {:insecure? true})
            :body)
        (catch Exception e
-         (timbre/warn (.getMessage e)))))
+         (timbre/warn (str (.getMessage e) " URL: " url)))))
 
 (defn- parse-meta
   "Parse HTML content's metadata."
@@ -60,7 +60,9 @@
   "Fetch feeds we need and send to channel."
   [feed-url]
   (go (doseq [f (parse-feed feed-url)]
-        (>! channel f))))
+        (>! channel f)
+        (<! (timeout 500))                ; delay 500ms
+        )))
 
 (defn- fetch-planet-clojure
   "Fetch feeds from http://planet.clojure.in"
@@ -74,7 +76,9 @@
                      (filter #(or (re-matches #"\[ANN\].*"  (:title %))
                                   (re-matches #"\[ANNs\].*" (:title %))
                                   (re-matches #"ANN:.*"     (:title %)))))]
-        (>! channel f))))
+        (>! channel f)
+        (<! (timeout 500))                ; delay 500ms
+        )))
 
 (defn- fetch-clojuretw-weekly
   "Fetch ClojureTW Weekly News. https://clojure.tw/weekly"
@@ -86,9 +90,11 @@
   []
   (go (doseq [f (->> (parse-feed "https://www.reddit.com/r/Clojure.rss")
                      (map (fn [item] 
-                           (update-in item [:link]
-                            (fn [url] (str "https://redd.it/" (get (str/split url #"\/") 6)))))))]
-       (>! channel f))))
+                            (update-in item [:link]
+                                       (fn [url] (str "https://redd.it/" (get (str/split url #"\/") 6)))))))]
+        (>! channel f)
+        (<! (timeout 500))                ; delay 500ms
+        )))
 
 ;; Async dispatcher
 (go-loop []
