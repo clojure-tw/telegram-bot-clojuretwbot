@@ -1,6 +1,6 @@
 (ns clojuretwbot.scheduler.feed-poster
   (:require [clj-http.client :as http]
-            [clojure.core.async :as async :refer [<! chan go-loop put! >! go]]
+            [clojure.core.async :as async :refer [<! chan go-loop put! >! go timeout]]
             [clojure.string :as str]
             [clojuretwbot.api.telegram :as telegram]
             [clojuretwbot.db :as db]
@@ -97,11 +97,14 @@
     ;; if link is not valid, ignore it.
     (when (and (not (db/contains-link? link))
                (valid-link? link))
-      (if (empty? description) ; some link can't be previewed by telegram
+      (if (empty? description)        ; some link can't be previewed by telegram
         (telegram/send-message! (str "<b>" title "</b>\n" link) {:disable_web_page_preview true})
         (telegram/send-message! (str link)))
       ;; Add link to db
-      (db/add-link link)))
+      (db/add-link link)
+      ;; To prevent get `HTTP response 429` from telegram, we need to limit message sending speed
+      (<! (timeout 500))                ; delay 500ms
+      ))
   (recur))
 
 (defn fetch-all
