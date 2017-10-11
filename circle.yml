@@ -29,9 +29,3 @@ dependencies:
 test:
   override:
     - ./lein test
-
-deployment:
-  publish:
-    branch: master
-    commands:
-      - ./deploy.sh
