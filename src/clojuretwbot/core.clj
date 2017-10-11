@@ -2,7 +2,6 @@
   (:require [clojuretwbot.scheduler :as scheduler]
             [clojuretwbot.db :as db]
             [clojuretwbot.config :refer [env]]
-            [clojuretwbot.server :as server]
             [taoensso.timbre :as timbre]
             [mount.core :as mount]))
 
@@ -10,11 +9,6 @@
   schele-server
   :start (scheduler/start)
   :stop  (scheduler/stop))
-
-(mount/defstate ^{:on-reload :noop}
-  web-server
-  :start (server/start)
-  :stop  (server/stop web-server))
 
 (defn stop-app []
   (doseq [component (:stopped (mount/stop))]

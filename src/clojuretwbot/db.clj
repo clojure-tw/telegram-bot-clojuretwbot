@@ -16,12 +16,5 @@
       first
       boolean))
 
-(defn aa
-  []
-  (apply str  (core/list-all-url))
-  )
-
-;; (core/list-all-url)
-
 (defn migrate [args]
   (migrations/migrate args))
