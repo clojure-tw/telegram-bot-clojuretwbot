@@ -89,7 +89,7 @@
   "Fetch Clojure subreddit. https://www.reddit.com/r/Clojure"
   []
   (go (doseq [f (->> (parse-feed "https://www.reddit.com/r/Clojure.rss")
-                     (map (fn [item] 
+                     (map (fn [item]
                             (update-in item [:link]
                                        (fn [url] (str "https://redd.it/" (get (str/split url #"\/") 6)))))))]
         (>! channel f)
@@ -108,13 +108,18 @@
     ;; if link is not valid, ignore it.
     (when (and (not (db/contains-link? link))
                (valid-link? link))
-      (if (clojuretw-weekly? link)
-        ;; special case for `https://clojure.tw/weekly` , we add instant view support
-        (telegram/send-message! (str "https://t.me/iv?url=" link "&rhash=1ec8a497c1a0b2"))
-        ;; some link may not be previewed by telegram
-        (telegram/send-message! (if (empty? description) 
-                                  (str "<b>" title "</b>\n" link) {:disable_web_page_preview true}
-                                  (str link))))
+      (telegram/send-message!
+       ;; message to send
+       (cond
+         ;; special case for `https://clojure.tw/weekly` , we add instant view support
+         (clojuretw-weekly? link) (str "https://t.me/iv?url=" link "&rhash=1ec8a497c1a0b2")
+         ;; some link may not be previewed by telegram
+         (empty? description) (str "<b>" title "</b>\n" link)
+         :else
+         (str link))
+       ;; extra parameter: for those link can't previewed by telegram, disable the web preview
+       (if (empty? description)
+         {:disable_web_page_preview true}))
       ;; Add link to db
       (db/add-link link)
       ;; To prevent get `HTTP response 429` from telegram, we need to limit message sending speed
