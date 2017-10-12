@@ -96,6 +96,11 @@
         (<! (timeout 500))                ; delay 500ms
         )))
 
+(defn clojuretw-weekly?
+  "Check if url is part of https://clojure.tw/weekly"
+  [url]
+  (str/starts-with? url "https://clojure.tw/weekly"))
+
 ;; Async dispatcher
 (go-loop []
   (let [{:keys [title link description] :as ch} (<! channel)]
@@ -103,9 +108,13 @@
     ;; if link is not valid, ignore it.
     (when (and (not (db/contains-link? link))
                (valid-link? link))
-      (if (empty? description)        ; some link can't be previewed by telegram
-        (telegram/send-message! (str "<b>" title "</b>\n" link) {:disable_web_page_preview true})
-        (telegram/send-message! (str link)))
+      (if (clojuretw-weekly? link)
+        ;; special case for `https://clojure.tw/weekly` , we add instant view support
+        (telegram/send-message! (str "https://t.me/iv?url=" link "&rhash=1ec8a497c1a0b2"))
+        ;; some link may not be previewed by telegram
+        (telegram/send-message! (if (empty? description) 
+                                  (str "<b>" title "</b>\n" link) {:disable_web_page_preview true}
+                                  (str link))))
       ;; Add link to db
       (db/add-link link)
       ;; To prevent get `HTTP response 429` from telegram, we need to limit message sending speed
