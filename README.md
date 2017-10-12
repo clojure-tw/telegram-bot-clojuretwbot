@@ -39,7 +39,7 @@ services:
       DATABASE: <YOUR DATABASE FILE>
 ```
 
-Then use `docker compose up -d` to make this bot running on background.
+Then use `docker-compose up -d` to make this bot running on background.
 
 For more info, please refer [Docker Compose Doc](https://docs.docker.com/compose/)
 
