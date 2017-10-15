@@ -118,7 +118,7 @@
          :else
          (str link))
        ;; extra parameter: for those link can't previewed by telegram, disable the web preview
-       (if (empty? description)
+       (if (and (empty? description) (not (clojuretw-weekly? link)))
          {:disable_web_page_preview true}))
       ;; Add link to db
       (db/add-link link)
